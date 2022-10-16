@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use function Symfony\Component\String\u;
 
 
 class Task extends Model
@@ -20,6 +20,10 @@ class Task extends Model
         'salt'
     ];
 
+    public function group(){
+        return $this->belongsTo('Group');
+    }
+
     public function complete(){
         $this->status_complete = 'Completed';
         $this->save();
@@ -30,7 +34,7 @@ class Task extends Model
         $this->hash_string = hash($this->algorithm_name, $this->string);
         for($i = 0; $i < $this->number_of_repetitions; $i++){
             $this->hash_string = hash($this->algorithm_name, $this->hash_string.'_'.$this->salt);
-            sleep($this->frequency);
+            usleep($this->frequency * 1000);
         }
         $this->complete();
     }

@@ -11,7 +11,7 @@ class CreateTaskRequest extends ApiRequest
     {
         return [
             "string" => ["required", "string"],
-            "frequency" => ["required", "integer"],
+            "frequency" => ["required", "integer", "min:2"],
             "number_of_repetitions" => ["required", "integer", "min:2", "max:30"],
             "algorithm_name" => ["required", "string", Rule::in(['md5', 'sha1', 'sha256'])]
         ];

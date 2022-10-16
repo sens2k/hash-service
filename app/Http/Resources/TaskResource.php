@@ -6,7 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class TaskResource extends JsonResource
 {
-    public static $wrap = "task";
+    public static $wrap = false;
 
     public function toArray($request)
     {
@@ -15,7 +15,10 @@ class TaskResource extends JsonResource
             'string' => $this->string,
             'algorithm' => $this->algorithm_name,
             'status' => $this->status_complete,
-            'hash' => $this->hash_string
+            'hash' => $this->hash_string,
+            'group_id' => $this->when($this->group_id != null, function (){
+                return $this->group_id;
+            })
         ];
     }
 }

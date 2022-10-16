@@ -1,0 +1,274 @@
+openapi: 3.0.0
+info:
+  title: Сервис для хеширования (Тестовое задание)
+  version: 0.0.1
+servers:
+  - url: http://127.0.0.1:8000/api/v1
+    description: Dev server
+paths:
+  /tasks:
+    get:
+      summary: Метод получения списка всех задач
+      tags:
+        - Task
+      operationId: getTasksList
+      responses:
+        '200':
+          description: Успешный ответ со списком всех задач
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Tasks"
+  /task:
+    post:
+      summary: Метод создания задачи
+      tags:
+        - Task
+      operationId: createTask
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TaskCreate"
+      responses:
+        '201':
+          description: Успешный ответ с id созданной задачи
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskCreateResponse"
+  /task/{id}:
+    get:
+      summary: Метод получения статуса выполнения задачи
+      tags:
+        - Task
+      operationId: getStatusTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор задачи
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Успешный ответ со списком всех задач
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Task"
+                
+  /task/stop/{id}:
+    get:
+      summary: Метод остановки выполнения задачи
+      tags:
+        - Task
+      operationId: stopTask
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор задачи
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskStopResponse"
+                
+  
+  /group:
+    post:
+      summary: Метод создания группы задач
+      tags:
+        - Group
+      operationId: createGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GroupCreate"
+      responses:
+        '201':
+          description: Успешный ответ id и batch_id созданной группы задач
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupCreateResponse"
+  
+  /group/{id}:
+    get:
+      summary: Метод получения статуса выполнения группы задач
+      tags:
+        - Group
+      operationId: getStatusGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор группы задач
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Успешный ответ со списком всех задач
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+  /group/stop/{id}:
+    get:
+      summary: Метод остановки выполнения группы задач
+      tags:
+        - Group
+      operationId: stopGroup
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Идентификатор группы задач
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Ответ
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TaskStopResponse"
+              
+components:
+  schemas:
+    Task:
+      type: object
+      required:
+        - id
+        - string
+        - algorithm
+        - status
+        - hash
+      properties:
+        id:
+          type: integer
+          example: 1
+        string:
+          type: string
+          example: Hello world
+        algorithm:
+          type: string
+          example: md5
+        status:
+          type: string
+          enum:
+            - Completed
+            - Not completed
+          example: Completed
+          description: Статус выполнения задачи
+        hash:
+          type: string
+          enum:
+            - Hash not ready
+            - 9c7befe9c0b80bd71755d8c3b1191bab
+          example: 9c7befe9c0b80bd71755d8c3b1191bab
+    Tasks:
+      properties:
+        "tasks":
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+    TaskCreate:
+      type: object
+      required:
+        - string
+        - number_of_repetitions
+        - frequency
+        - algorithm_name
+      properties:
+        string:
+          type: string
+          example: Hello world
+        number_of_repetitions:
+          type: integer
+          example: 2
+        frequency:
+          type: integer
+          example: 200
+          description: Статус выполнения задачи
+        algorithm_name:
+          type: string
+          example: sha256
+      
+    TaskCreateResponse:
+      type: object
+      required:
+        - status
+        - Id of your task 
+      properties:
+        status:
+          type: string
+          example: successful
+        Id of your task:
+          type: integer
+          example: 2
+          
+    TaskStopResponse:
+      type: object
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          example: This method is under development
+          
+    Group:
+      type: object
+      required:
+        - status_complete
+        - batch_id
+      properties:
+        status_complete:
+          type: string
+          example: successful
+        batch_id:
+          type: string
+          example: 9783feea-032f-4837-a35e-e354d60814b3
+    
+    GroupCreate:
+      type: object
+      required:
+        - string
+        - number_of_repetitions
+        - frequency
+        - algorithm_name
+      properties:
+        "tasks":
+          type: array
+          items:
+            $ref: "#/components/schemas/Task"
+            
+    GroupCreateResponse:
+      type: object
+      required:
+        - status
+        - Id of your task group
+        - Batch id
+      properties:
+        status:
+          type: string
+          example: successful
+        Id of your task group:
+          type: integer
+          example: 1
+        Batch id:
+          type: string
+          example: 9783feea-032f-4837-a35e-e354d60814b3
+    

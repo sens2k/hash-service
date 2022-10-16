@@ -56,7 +56,7 @@ class TaskController extends Controller
     /**
      * Создание группы задач
      */
-    public function createGroupOfTask(CreateGroupOfTasksRequest $requests)
+    public function createTaskGroup(CreateGroupOfTasksRequest $requests)
     {
         $group = Group::create();
         $requests = $requests->validated();
@@ -68,18 +68,22 @@ class TaskController extends Controller
                     "frequency" => $taskData['frequency'],
                     "number_of_repetitions" => $taskData['number_of_repetitions'],
                     "algorithm_name" => $taskData['algorithm_name'],
-                    "salt" => Task::generateSalt()
+                    "salt" => Task::generateSalt(),
+                    "group_id" => $group->id,
                 ]
             );
             $jobs[] = new HashString($task);
         }
-        Bus::batch($jobs)
+
+        $batch = Bus::batch($jobs)
             ->onQueue('high')
             ->finally(function () use ($group) {$group->complete();})
             ->dispatch();
 
+        $group->setBatchId($batch->id);
+
         return response()
-            ->json(['status' => 'successful', 'Id of your task group' => $group->id])
+            ->json(['status' => 'successful', 'Id of your task group' => $group->id, 'Batch id' => $group->batch_id])
             ->setStatusCode(201, "Group created");
     }
 
@@ -88,5 +92,19 @@ class TaskController extends Controller
      */
     public function getStatusTaskGroup($id){
         return new GroupResource(Group::findOrFail($id));
+    }
+
+    /**
+     * Отмена задачи
+     */
+    public function stopTask($id){
+        return response()->json(['status' => 'This method is under development']);
+    }
+
+    /**
+     * Отмена группы задач
+     */
+    public function stopTaskGroup($id){
+        return response()->json(['status' => 'This method is under development']);
     }
 }

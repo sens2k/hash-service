@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('salt');
             $table->string('status_complete')->default('Not completed');
             $table->string('hash_string')->nullable()->default('Hash not ready');
-            $table->string('group_id')->nullable();
+            $table->integer('group_id')->nullable();
         });
     }
 

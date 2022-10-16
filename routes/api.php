@@ -27,6 +27,10 @@ Route::get('v1/task/{id}', [TaskController::class, 'getStatusTask']); //Полу
 
 Route::post('v1/task', [TaskController::class, 'createTask']); //Создания задачи
 
-Route::post('v1/group', [TaskController::class, 'createGroupOfTask']); //Создание группы задач
+Route::post('v1/group', [TaskController::class, 'createTaskGroup']); //Создание группы задач
 
 Route::get('v1/group/{id}', [TaskController::class, 'getStatusTaskGroup']); //Получение статуса выполнения группы задач
+
+Route::get('v1/task/stop/{id}', [TaskController::class, 'stopTask']); //Остановка задачи
+
+Route::get('v1/group/stop/{id}', [TaskController::class, 'stopTaskGroup']); //Остановка группы задач

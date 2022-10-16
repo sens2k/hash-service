@@ -1,66 +1,79 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+<h1 align="center">Сервис для хеширования</h1>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## -> Установка проекта
 
-## About Laravel
+Скачайте git репозиторий при помощи команды.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+###`git clone "https://github.com/sens2k/hash-service.git"`
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+Перейдите в папку с проектом и подключите зависимости при помощи [Composer](https://getcomposer.org/).
+</br>Вводим команду в терминале:
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+###`composer install`
 
-## Learning Laravel
+## -> Подключение к базе данных
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Откройте файл .env и настройте подключение к БД.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE= название БД
+DB_USERNAME= имя пользователя
+DB_PASSWORD= пароль
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 2000 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## -> Выполнение миграций
 
-## Laravel Sponsors
+Введи команду в терминале
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+###`php artisan migrate`
 
-### Premium Partners
+## -> Запуск проект
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+Введите команду в терминале
 
-## Contributing
+###`php artisan serve`
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## -> Настройка очередей
 
-## Code of Conduct
+Для обработки задач, в проекте используются очереди.
+</br>Для запуска одной очереди введите команду в отдельном окне терминала .
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+###`php artisan queue:work --queue=high,low`
 
-## Security Vulnerabilities
+Для реализации одновременной обратоки задач, необходимо запустить несколько очередей. 
+Это можно сделать локально испоьзуя несколько вкладко в терминале
+</br>Количество очередей определяет количество одновременно выполняемых задач.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+###Чтобы команда queue:work работала постоянно, нужно установить монитор процессов, Supervisor.
 
-## License
+Если вы используете Ubuntu, то можете установить его с помощью команды:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+###`sudo apt-get install supervisor`
+
+Далее необходимо создать конфиг файл в каталоге `/etc/supervisor/conf.d`.
+Файл конфигурации должен выглядеть так:
+```
+[program:jobs-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /ПУТЬ К ВАШЕМУ ПРОЕКТУ/host-service/artisan queue:work --queue=high,low
+autostart=true
+autorestart=true
+user=djug
+numprocs=5
+redirect_stderr=true
+stdout_logfile=/ПУТЬ К ВАШЕМУ ПРОЕКТУ/host-service/worker.log
+```
+В данном случае `numprocs` - максимальное количество одновременно выполняющихся задач
+
+После добавления всех необходимых конфигураций нам нужно будет выполнить следующие команды, чтобы учесть новые изменения:
+
+```
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start all
+```
+
+###Документация к API(OpenAPI etc.) `Api-documentation.yaml` находится в корне проекта.

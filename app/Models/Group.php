@@ -9,11 +9,21 @@ class Group extends Model
     public $timestamps = false;
 
     protected $fillable = [
-        'status_complete'
+        'status_complete',
+        'batch_group'
     ];
+
+    public function tasks(){
+        return $this->hasMany('Task');
+    }
 
     public function complete(){
         $this->status_complete = 'Completed';
+        $this->save();
+    }
+
+    public function setBatchId($batchId){
+        $this->batch_id = $batchId;
         $this->save();
     }
 }

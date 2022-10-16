@@ -16,6 +16,7 @@ return new class extends Migration
         Schema::create('groups', function (Blueprint $table) {
             $table->id();
             $table->string('status_complete')->default('Not completed');
+            $table->string('batch_id')->nullable();
         });
     }
 
