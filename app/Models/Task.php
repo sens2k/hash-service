@@ -3,8 +3,6 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use function Symfony\Component\String\u;
-
 
 class Task extends Model
 {
@@ -24,11 +22,13 @@ class Task extends Model
         return $this->belongsTo('Group');
     }
 
-    public function complete(){
+    /* Метод изменения статуса выполнения */
+    public function execute(){
         $this->status_complete = 'Completed';
         $this->save();
     }
 
+    /* Метод создания хеша исходной строки */
     public function createHash()
     {
         $this->hash_string = hash($this->algorithm_name, $this->string);
@@ -36,9 +36,10 @@ class Task extends Model
             $this->hash_string = hash($this->algorithm_name, $this->hash_string.'_'.$this->salt);
             usleep($this->frequency * 1000);
         }
-        $this->complete();
+        $this->execute();
     }
 
+    /* Генерация соли */
     public static function generateSalt($length = 10){
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);

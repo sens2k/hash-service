@@ -20,24 +20,22 @@ class TaskController extends Controller
     /**
      * Получение статуса выполнения задачи
      */
-    public function getStatusTask($id)
-    {
+    public function getStatusTask($id){
         return new TaskResource(Task::findOrFail($id));
     }
 
     /**
      * Получение списка всех задач
      */
-    public function getTasksList()
-    {
+    public function getTasksList(){
         return new TaskCollection(Task::all());
     }
 
     /**
      * Создание задачи
      */
-    public function createTask(CreateTaskRequest $request)
-    {
+    public function createTask(CreateTaskRequest $request){
+        /* Создание новой задачи */
         $task = Task::create(
             [
                 "string" => $request->string,
@@ -47,7 +45,12 @@ class TaskController extends Controller
                 "salt" => Task::generateSalt()
             ]
         );
+
+        /*  Создание новой job и добавление туда новой задачи,
+        с последующем добавлением job в очеред с низким(low) приоритетом  */
         HashString::dispatch($task)->onQueue('low');
+
+        /* Возвращение ответа от сервера со статусом 201 */
         return response()
             ->json(['status' => 'successful', 'Id of your task' => $task->id])
             ->setStatusCode(201, "Task created");
@@ -56,10 +59,11 @@ class TaskController extends Controller
     /**
      * Создание группы задач
      */
-    public function createTaskGroup(CreateGroupOfTasksRequest $requests)
-    {
+    public function createTaskGroup(CreateGroupOfTasksRequest $requests){
+        /* Создание новой группы задач */
         $group = Group::create();
-        $requests = $requests->validated();
+
+        /* Формирование массива задач */
         $tasksRequestData = $requests['tasks'];
         foreach ($tasksRequestData ?? [] as $taskData) {
             $task = Task::create(
@@ -74,14 +78,16 @@ class TaskController extends Controller
             );
             $jobs[] = new HashString($task);
         }
-
+        /* Добавление созданного массива задач в очередь с высоким(high) приоритетом */
         $batch = Bus::batch($jobs)
             ->onQueue('high')
-            ->finally(function () use ($group) {$group->complete();})
+            ->finally(function () use ($group) {$group->execute();})
             ->dispatch();
 
+        /* Добавление новой группе id пакета */
         $group->setBatchId($batch->id);
 
+        /* Возвращение ответа от сервера со статусом 201 */
         return response()
             ->json(['status' => 'successful', 'Id of your task group' => $group->id, 'Batch id' => $group->batch_id])
             ->setStatusCode(201, "Group created");

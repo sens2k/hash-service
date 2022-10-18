@@ -17,11 +17,13 @@ class Group extends Model
         return $this->hasMany('Task');
     }
 
-    public function complete(){
+    /* Метод изменения статуса выполнения */
+    public function execute(){
         $this->status_complete = 'Completed';
         $this->save();
     }
 
+    /* Метод для установки id пакета задач */
     public function setBatchId($batchId){
         $this->batch_id = $batchId;
         $this->save();
