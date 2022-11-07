@@ -23,30 +23,9 @@ class Task extends Model
     }
 
     /* Метод изменения статуса выполнения */
-    public function execute(){
-        $this->status_complete = 'Completed';
+    public function setStatusComplete($status = 'Completed'){
+        $this->status_complete = $status;
         $this->save();
     }
 
-    /* Метод создания хеша исходной строки */
-    public function createHash()
-    {
-        $this->hash_string = hash($this->algorithm_name, $this->string);
-        for($i = 0; $i < $this->number_of_repetitions; $i++){
-            $this->hash_string = hash($this->algorithm_name, $this->hash_string.'_'.$this->salt);
-            usleep($this->frequency * 1000);
-        }
-        $this->execute();
-    }
-
-    /* Генерация соли */
-    public static function generateSalt($length = 10){
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $salt = '';
-        for ($i = 0; $i < $length; $i++) {
-            $salt .= $characters[rand(0, $charactersLength - 1)];
-        }
-        return $salt;
-    }
 }

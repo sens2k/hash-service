@@ -18,8 +18,8 @@ class Group extends Model
     }
 
     /* Метод изменения статуса выполнения */
-    public function execute(){
-        $this->status_complete = 'Completed';
+    public function setStatusComplete($status = 'Completed'){
+        $this->status_complete = $status;
         $this->save();
     }
 

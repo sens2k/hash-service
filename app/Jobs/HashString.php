@@ -9,6 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Bus\Batchable;
+use App\Services\HashService;
 
 class HashString implements ShouldQueue
 {
@@ -23,6 +24,6 @@ class HashString implements ShouldQueue
 
     public function handle()
     {
-        $this->task->createHash();
+        HashService::createHash($this->task);
     }
 }
