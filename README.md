@@ -28,7 +28,7 @@ DB_PASSWORD= пароль
 
 Введи команду в терминале
 
-###`php artisan migrate`
+`php artisan migrate`
 
 ## -> Запуск проект
 
